@@ -30,14 +30,14 @@ public class TestServlet extends HttpServlet {
         // 通过输出流向 HTTP 前端发送内容
         PrintWriter writer = resp.getWriter();
         Response response = new Response();
-        response.setCode("OK 200");
+        response.setCode("200");
         response.setMessage("操作成功");
         List<String> list = new ArrayList<>();
         list.add("a");
         list.add("b");
         list.add("c");
         response.setData(list);
-        // 将 response 转换成一个字符串打印在前端界面上
+        // 将 response 转换成一个 json 字符串打印在前端界面上
         writer.println(JSONUtil.write(response));
         writer.flush();
     }

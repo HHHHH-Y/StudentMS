@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="maven-test:war2">
+    <output-path>$PROJECT_DIR$/out/artifacts/maven_test_war2</output-path>
+    <root id="archive" name="maven-test_war.war">
+      <element id="artifact" artifact-name="maven-test:war exploded" />
+    </root>
+  </artifact>
+</component>
