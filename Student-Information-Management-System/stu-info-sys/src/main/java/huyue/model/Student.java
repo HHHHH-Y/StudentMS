@@ -23,4 +23,5 @@ public class Student {
     private String studentEmail;
     private Integer classesId;
     private Date createTime;
+    private Classes classes;
 }
