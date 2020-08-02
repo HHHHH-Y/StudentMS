@@ -19,13 +19,14 @@ function resetConfirmPassword(){
     });
 }
 
-let dev = false;
+let dev = false; // 表示是否默认填充这个数据
 let devLoginData = {
     username: "abc",
     password: "123"
 };
 
 $(function () {
+    // 管理后台一般不开放注册功能
     // $("#btn_to_register").hide();//如果要开放注册功能，打开注册按钮
     resetConfirmPassword();
     $("#login_form").submit(function (e) {
