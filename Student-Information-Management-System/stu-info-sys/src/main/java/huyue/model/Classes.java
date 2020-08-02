@@ -15,7 +15,7 @@ import java.util.Date;
 @Setter
 @Getter
 @ToString
-public class Classes {
+public class Classes extends DictionaryTag{
     private Integer id;
     private String classesName;
     private String classesGraduateYear;
