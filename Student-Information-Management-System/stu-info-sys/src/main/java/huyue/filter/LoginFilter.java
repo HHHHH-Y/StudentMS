@@ -45,8 +45,8 @@ public class LoginFilter implements Filter {
         // 判断是否登录了, 如果没有登录
         if (session == null) {
             // 首页重定向到登录页面, 如果是后端接口, 就返回错误的 json 数据
-            req.setCharacterEncoding("utf-8");
-            res.setCharacterEncoding("utf-8");
+            /*req.setCharacterEncoding("utf-8");
+            res.setCharacterEncoding("utf-8");*/
             // 首页重定向到登录页面
             if ("/public/page/main.html".equals(uri)) {
                 res.setContentType("text/html; charset=UTF-8");

@@ -4,6 +4,7 @@ import huyue.dao.DictionaryTagDAO;
 import huyue.model.DictionaryTag;
 import huyue.model.Response;
 import huyue.util.JSONUtil;
+import huyue.util.ThreadLocalHolder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -52,6 +53,7 @@ public abstract class AbstractBaseServlet extends HttpServlet {
             // 执行 jdbc 成功之后才设置的这些选项
             response.setSuccess(true);
             response.setCode("200");
+            response.setTotal(ThreadLocalHolder.getTOTAL().get()); // 不管是否分页操作, 分页接口都获取当前线程中的 total 变量
             response.setMessage("操作成功");
             response.setData(o);
         } catch (Exception e) {
@@ -66,6 +68,8 @@ public abstract class AbstractBaseServlet extends HttpServlet {
             String stackTrace = sw.toString();
             System.err.println(stackTrace); // 先将堆栈信息打印到控制台
             response.setStackTrace(stackTrace); // 将堆栈信息放入响应信息中
+        } finally {
+            ThreadLocalHolder.getTOTAL().remove(); // 在线程结束前, 一定要记得删除变量, 如果不删除, 可能存在内存泄漏的问题
         }
         // 将 response 转换成一个 json 字符串打印在前端界面上
         writer.println(JSONUtil.write(response));

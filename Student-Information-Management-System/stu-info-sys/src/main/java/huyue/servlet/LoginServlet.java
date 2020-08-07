@@ -19,7 +19,7 @@ import javax.servlet.http.HttpSession;
 public class LoginServlet extends AbstractBaseServlet{
     @Override
     protected Object process(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        // 以为读取的是 JSON 数据, 所以应该从输入流中读取数据转化成 java 对应的类
+        // 因为读取的是 JSON 数据, 所以应该从输入流中读取数据转化成 java 对应的类
         User user = JSONUtil.read(req.getInputStream(), User.class); // 前端请求的用户信息
         // 数据库校验用户名和密码
         User query = UserDAO.query(user);

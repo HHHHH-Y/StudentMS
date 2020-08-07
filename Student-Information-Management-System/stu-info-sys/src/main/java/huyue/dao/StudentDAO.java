@@ -2,8 +2,10 @@ package huyue.dao;
 
 import huyue.model.Classes;
 import huyue.model.DictionaryTag;
+import huyue.model.Page;
 import huyue.model.Student;
 import huyue.util.DBUtil;
+import huyue.util.ThreadLocalHolder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +21,7 @@ import java.util.List;
  * Date: 2020-08-01
  */
 public class StudentDAO {
-    public static List<Student> query() {
+    public static List<Student> query(Page p) {
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -28,7 +30,7 @@ public class StudentDAO {
             // 1. 获取数据库连接
             c = DBUtil.getConnection();
             // 在复制 sql 语句的时候, 在需要空格的地方加上空格或者 tab 缩进
-            String sql = "select s.id," +
+            StringBuilder sql = new StringBuilder("select s.id," +
                     "       s.create_time," +
                     "       s.student_name," +
                     "       s.student_no," +
@@ -41,9 +43,43 @@ public class StudentDAO {
                     "       c.classes_major," +
                     "       c.classes_desc" +
                     "   from student s" +
-                    "         join classes c on s.classes_id = c.id"; // 关联班级表和学生表, 查询需要的数据(学生的数据和班级的数据)
+                    "         join classes c on s.classes_id = c.id"); // 关联班级表和学生表, 查询需要的数据(学生的数据和班级的数据)
+            // 如果搜索条件有值且不为空, 进行搜索条件的拼接, 将搜索条件定为 学生姓名
+            if(p.getSearchText() != null && p.getSearchText().trim().length() > 0) {
+                sql.append("    where s.student_name like ?"); // 模糊查询, 只要包含就可以
+            }
+            // 如果排序条件有值且不为空, 进行排序条件的拼接
+            if(p.getSortOrder() != null && p.getSortOrder().trim().length() > 0) {
+                // 这里拼接字符串的方式存在 sql 注入的风险, 一般会校验一下, 这里省略
+                sql.append("    order by s.create_time " + p.getSortOrder());  // 不能使用占位符替换的方式实现: 因为字符串替换的时候会带上 '', 即 order by xxx 'asc'
+            }
+
+            // ①. 获取查询总数量: 以上 sql 可以复用, 使用子查询的方式
+            StringBuilder countSql = new StringBuilder("select count(0) count from (");
+            countSql.append(sql);
+            countSql.append(") tmp");
+            ps = c.prepareStatement(countSql.toString());
+            if(p.getSearchText() != null && p.getSearchText().trim().length() > 0) {
+                ps.setString(1, "%" + p.getSearchText() + "%"); // 仍然使用的是模糊匹配, 模糊查询使用的是包含操作
+            }
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                int count = rs.getInt("count");
+                ThreadLocalHolder.getTOTAL().set(count); // 设置 total 变量到我们当前的线程中设置到当前线程中的 ThreadLocalMap 数据结构中保存
+            }
+
+            // ②. 获取分页的数据
+            sql.append("    limit ?,?"); // 第一个是索引位置, 第二个是查询数量
             // 2. 创建操作命令对象
-            ps = c.prepareStatement(sql);
+            ps = c.prepareStatement(sql.toString());
+            int index = 1;
+            // 设置 查询条件 的
+            if(p.getSearchText() != null && p.getSearchText().trim().length() > 0) {
+                ps.setString(index++, "%" + p.getSearchText() + "%"); // 仍然使用的是模糊查询, 模糊查询使用的是包含操作
+            }
+            ps.setInt(index++, (p.getPageNumber() - 1) * p.getPageSize()); // 设置索引 = 上一页的页码 * 每一页的数量
+            ps.setInt(index++, p.getPageSize());
+
             // 3. 执行 sql 语句
             rs = ps.executeQuery();
             // 4. 处理查询结果集
