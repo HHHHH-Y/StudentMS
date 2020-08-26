@@ -21,6 +21,7 @@ import java.util.List;
  * Date: 2020-08-01
  */
 public class StudentDAO {
+    // 查询学生列表（不仅有学生信息，还有班级信息）
     public static List<Student> query(Page p) {
         Connection c = null;
         PreparedStatement ps = null;

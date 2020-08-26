@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
- * Description:
+ * Description: 用户登录时数据库的操作
  * User: HHH.Y
  * Date: 2020-08-02
  */
